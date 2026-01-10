@@ -1,18 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Kamar - Admin')
+@section('title', 'Tambah Kamar')
+@section('page-title', '➕ Tambah Kamar Baru')
+@section('page-subtitle', 'Isi form di bawah untuk menambahkan kamar baru')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-        <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Tambah Kamar Baru</h1>
-            <p class="text-gray-600 mt-2">Isi form di bawah untuk menambahkan kamar baru</p>
-        </div>
-
-        <!-- Form Tambah Kamar -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+<!-- Form Tambah Kamar -->
+<div class="bg-white rounded-lg shadow-md p-6">
             <form action="{{ route('admin.rooms.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
@@ -113,12 +107,22 @@
                         id="photo" 
                         name="photo" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('photo') border-red-500 @enderror"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/jpg,image/gif,image/webp,image/bmp"
+                        onchange="previewImage(event)"
                     >
                     @error('photo')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-gray-500 text-sm mt-1">Format: JPEG, PNG, GIF | Max: 2MB</p>
+                    <p class="text-gray-500 text-sm mt-1">
+                        Format: JPEG, PNG, GIF, WebP, BMP | Max: 5MB | 
+                        <span class="font-semibold text-blue-600">Otomatis dikonversi ke JPEG</span>
+                    </p>
+                    
+                    <!-- Preview Foto -->
+                    <div id="imagePreview" class="mt-3 hidden">
+                        <p class="text-sm font-semibold text-gray-700 mb-2">Preview:</p>
+                        <img id="preview" class="w-48 h-32 object-cover rounded-lg border border-gray-300" alt="Preview">
+                    </div>
                 </div>
 
                 <!-- Deskripsi -->
@@ -182,8 +186,25 @@
                 <li>✓ Harga untuk 1 malam menginap</li>
                 <li>✓ Kapasitas adalah jumlah maksimal tamu</li>
                 <li>✓ Centang "Kamar Aktif" agar bisa dipesan</li>
+                <li>✓ <strong>Foto akan otomatis dikonversi ke format JPEG untuk kompatibilitas maksimal</strong></li>
             </ul>
         </div>
     </div>
 </div>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('preview');
+            const previewContainer = document.getElementById('imagePreview');
+            preview.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 @endsection

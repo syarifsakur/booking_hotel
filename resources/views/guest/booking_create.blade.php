@@ -1,10 +1,21 @@
-@extends('layouts.app')
+@extends('guest')
 
 @section('title', 'Pesan Kamar')
 
 @section('content')
 <div class="max-w-6xl mx-auto p-6">
   <h1 class="text-2xl font-semibold mb-4">Konfirmasi Pesanan</h1>
+
+  @if ($errors->any())
+    <div class="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <div class="font-semibold mb-1">Periksa kembali data Anda:</div>
+      <ul class="list-disc list-inside space-y-1">
+        @foreach ($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
+  @endif
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 bg-white p-6 shadow rounded">
@@ -14,32 +25,33 @@
 
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700">Nama Tamu</label>
-          <input name="guest_name" required class="mt-1 block w-full border p-2 rounded" />
+          <input name="guest_name" value="{{ old('guest_name') }}" required class="mt-1 block w-full border p-2 rounded" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input name="guest_email" class="mt-1 block w-full border p-2 rounded" />
+            <input name="guest_email" type="email" value="{{ old('guest_email') }}" required class="mt-1 block w-full border p-2 rounded" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-            <input name="guest_phone" class="mt-1 block w-full border p-2 rounded" />
+            <input name="guest_phone" value="{{ old('guest_phone') }}" required class="mt-1 block w-full border p-2 rounded" />
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Check-in</label>
-            <input id="check_in" name="check_in" type="date" required class="mt-1 block w-full border p-2 rounded" />
+            <input id="check_in" name="check_in" type="date" value="{{ old('check_in', request('check_in')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Check-out</label>
-            <input id="check_out" name="check_out" type="date" required class="mt-1 block w-full border p-2 rounded" />
+            <input id="check_out" name="check_out" type="date" value="{{ old('check_out', request('check_out')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Qty</label>
-            <input id="qty" name="qty" type="number" min="1" value="1" class="mt-1 block w-full border p-2 rounded" />
+            <input id="qty" name="qty" type="number" min="1" max="1" value="{{ old('qty', 1) }}" class="mt-1 block w-full border p-2 rounded" />
+            <p class="text-xs text-gray-500 mt-1">Satu kamar hanya dapat dipesan satu kali per rentang tanggal.</p>
           </div>
         </div>
 

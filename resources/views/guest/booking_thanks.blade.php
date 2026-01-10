@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('guest')
 
 @section('title', 'Booking Berhasil')
 

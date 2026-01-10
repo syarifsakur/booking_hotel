@@ -20,6 +20,15 @@ class Room extends Model
 
     public function bookingItems()
     {
-        return $this->hasMany(BookingItem::class, 'room_uuid', 'uuid');
+        // Link ke item booking yang memakai room_id (bukan uuid)
+        return $this->hasMany(BookingItem::class, 'room_id', 'id');
+    }
+
+    public function activeBookingItems()
+    {
+        // Hanya booking yang masih berlaku (unpaid/paid)
+        return $this->bookingItems()->whereHas('booking', function ($q) {
+            $q->whereIn('payment_status', ['unpaid', 'paid']);
+        });
     }
 }

@@ -35,7 +35,7 @@ class AdminController extends Controller
     public function bookings()
     {
         return view('admin.bookings.index', [
-            'bookings' => Booking::with('user')->paginate(10),
+            'bookings' => Booking::latest()->paginate(10),
         ]);
     }
 
@@ -59,7 +59,7 @@ class AdminController extends Controller
             'price_per_night' => 'required|numeric|min:0',
             'capacity'        => 'required|integer|min:1|max:10',
             'description'     => 'nullable|string|max:1000',
-            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp|max:5120',
             'is_active'       => 'boolean',
         ]);
 
@@ -67,8 +67,21 @@ class AdminController extends Controller
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/rooms', $filename);
+            
+            // Generate nama file unik dengan format JPEG
+            $filename = time() . '_' . uniqid() . '.jpg';
+            $storagePath = storage_path('app/public/rooms');
+            
+            // Buat folder jika belum ada
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0755, true);
+            }
+            
+            $fullPath = $storagePath . '/' . $filename;
+            
+            // Konversi dan optimasi foto ke JPEG menggunakan GD
+            $this->convertAndOptimizeImage($file->getRealPath(), $fullPath);
+            
             $validated['photo'] = 'rooms/' . $filename;
         }
 
@@ -77,5 +90,67 @@ class AdminController extends Controller
         return redirect()
             ->route('admin.rooms')
             ->with('success', 'Kamar berhasil ditambahkan!');
+    }
+
+    /**
+     * Konversi gambar apapun ke JPEG dan optimasi untuk web
+     */
+    private function convertAndOptimizeImage($sourcePath, $destinationPath, $maxWidth = 1200, $quality = 85)
+    {
+        // Deteksi tipe gambar
+        $imageInfo = getimagesize($sourcePath);
+        $mimeType = $imageInfo['mime'];
+        
+        // Buat resource gambar sesuai tipe
+        switch ($mimeType) {
+            case 'image/jpeg':
+                $image = imagecreatefromjpeg($sourcePath);
+                break;
+            case 'image/png':
+                $image = imagecreatefrompng($sourcePath);
+                break;
+            case 'image/gif':
+                $image = imagecreatefromgif($sourcePath);
+                break;
+            case 'image/webp':
+                $image = imagecreatefromwebp($sourcePath);
+                break;
+            case 'image/bmp':
+            case 'image/x-ms-bmp':
+                $image = imagecreatefrombmp($sourcePath);
+                break;
+            default:
+                throw new \Exception('Format gambar tidak didukung');
+        }
+        
+        // Dapatkan dimensi asli
+        $originalWidth = imagesx($image);
+        $originalHeight = imagesy($image);
+        
+        // Hitung dimensi baru (resize jika lebih besar dari maxWidth)
+        if ($originalWidth > $maxWidth) {
+            $newWidth = $maxWidth;
+            $newHeight = intval(($originalHeight / $originalWidth) * $maxWidth);
+        } else {
+            $newWidth = $originalWidth;
+            $newHeight = $originalHeight;
+        }
+        
+        // Buat gambar baru dengan dimensi yang sudah dioptimasi
+        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+        
+        // Set background putih untuk gambar transparan
+        $white = imagecolorallocate($newImage, 255, 255, 255);
+        imagefill($newImage, 0, 0, $white);
+        
+        // Resize dengan kualitas tinggi
+        imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+        
+        // Simpan sebagai JPEG dengan kualitas optimal
+        imagejpeg($newImage, $destinationPath, $quality);
+        
+        // Bersihkan memory
+        imagedestroy($image);
+        imagedestroy($newImage);
     }
 }
