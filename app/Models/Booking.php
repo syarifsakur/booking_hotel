@@ -22,6 +22,14 @@ class Booking extends Model
         'paid_at',
         'expires_at',
         'qr_code_data',
+        'status',
+    ];
+
+    protected $casts = [
+        'check_in' => 'date',
+        'check_out' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // RELASI: 1 booking punya banyak item kamar

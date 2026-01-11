@@ -1,15 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Booking')
-@section('page-title', '📋 Daftar Booking')
-@section('page-subtitle', 'Kelola semua pemesanan hotel')
+@section('title', 'Riwayat Booking')
+@section('page-title', '📜 Riwayat Booking')
+@section('page-subtitle', 'Kelola booking yang sudah selesai')
 
 @section('content')
-<!-- TABEL BOOKING -->
+<!-- TABEL BOOKING RIWAYAT -->
 <div class="bg-white rounded-xl shadow overflow-hidden">
     <!-- HEADER TABEL -->
     <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-        <h2 class="font-bold text-slate-900">Total Booking: {{ $bookings->total() }}</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-bold text-slate-900">Total Riwayat: {{ $bookings->total() }}</h2>
+            <a href="{{ route('admin.bookings') }}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
+                ← Kembali ke Daftar Booking
+            </a>
+        </div>
     </div>
 
     <!-- TABEL ISI -->
@@ -48,24 +53,15 @@
                             {{ is_string($booking->check_out) ? $booking->check_out : $booking->check_out->format('d M Y') }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm">
-                            <form action="{{ route('admin.bookings.update-status', $booking->id) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('PATCH')
-                                <select name="status" onchange="this.form.submit()" class="px-3 py-1 rounded-full text-xs font-semibold border-0 cursor-pointer
-                                    {{ $booking->status == 'aktif' ? 'bg-blue-100 text-blue-700' : '' }}
-                                    {{ $booking->status == 'tidak_aktif' ? 'bg-red-100 text-red-700' : '' }}
-                                    {{ $booking->status == 'selesai' ? 'bg-green-100 text-green-700' : '' }}">
-                                    <option value="aktif" {{ $booking->status == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="tidak_aktif" {{ $booking->status == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
-                                    <option value="selesai" {{ $booking->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                </select>
-                            </form>
+                            <span class="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                Selesai
+                            </span>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="7" class="px-6 py-8 text-center text-slate-500">
-                            📭 Belum ada booking
+                            📭 Belum ada riwayat booking
                         </td>
                     </tr>
                 @endforelse

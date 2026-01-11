@@ -53,9 +53,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/rooms', [AdminController::class, 'rooms'])->name('admin.rooms');
     Route::get('/admin/rooms/create', [AdminController::class, 'createRoom'])->name('admin.rooms.create');
     Route::post('/admin/rooms', [AdminController::class, 'storeRoom'])->name('admin.rooms.store');
+    Route::get('/admin/rooms/{room}/edit', [AdminController::class, 'editRoom'])->name('admin.rooms.edit');
+    Route::put('/admin/rooms/{room}', [AdminController::class, 'updateRoom'])->name('admin.rooms.update');
+    Route::delete('/admin/rooms/{room}', [AdminController::class, 'deleteRoom'])->name('admin.rooms.destroy');
     
     // Kelola Booking
     Route::get('/admin/bookings', [AdminController::class, 'bookings'])->name('admin.bookings');
+    Route::get('/admin/bookings-history', [AdminController::class, 'bookingHistory'])->name('admin.bookings.history');
+    Route::patch('/admin/bookings/{booking}/update-status', [AdminController::class, 'updateBookingStatus'])->name('admin.bookings.update-status');
     
     // Kelola User
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');

@@ -35,7 +35,14 @@ class AdminController extends Controller
     public function bookings()
     {
         return view('admin.bookings.index', [
-            'bookings' => Booking::latest()->paginate(10),
+            'bookings' => Booking::whereIn('status', ['aktif', 'tidak_aktif'])->latest()->paginate(10),
+        ]);
+    }
+
+    public function bookingHistory()
+    {
+        return view('admin.bookings.history', [
+            'bookings' => Booking::where('status', 'selesai')->latest()->paginate(10),
         ]);
     }
 
@@ -90,6 +97,70 @@ class AdminController extends Controller
         return redirect()
             ->route('admin.rooms')
             ->with('success', 'Kamar berhasil ditambahkan!');
+    }
+
+    public function editRoom(Room $room)
+    {
+        return view('admin.rooms.edit', compact('room'));
+    }
+
+    public function updateRoom(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'name'            => 'required|string|max:50|unique:rooms,name,' . $room->id,
+            'type'            => 'required|string|max:50',
+            'price_per_night' => 'required|numeric|min:0',
+            'capacity'        => 'required|integer|min:1|max:10',
+            'description'     => 'nullable|string|max:1000',
+            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp|max:5120',
+            'is_active'       => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = time() . '_' . uniqid() . '.jpg';
+            $storagePath = storage_path('app/public/rooms');
+
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0755, true);
+            }
+
+            $fullPath = $storagePath . '/' . $filename;
+            $this->convertAndOptimizeImage($file->getRealPath(), $fullPath);
+
+            if ($room->photo) {
+                $oldPhotoPath = storage_path('app/public/' . $room->photo);
+                if (file_exists($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
+                }
+            }
+
+            $validated['photo'] = 'rooms/' . $filename;
+        }
+
+        $room->update($validated);
+
+        return redirect()
+            ->route('admin.rooms')
+            ->with('success', 'Kamar berhasil diperbarui!');
+    }
+
+    public function deleteRoom(Room $room)
+    {
+        if ($room->photo) {
+            $photoPath = storage_path('app/public/' . $room->photo);
+            if (file_exists($photoPath)) {
+                unlink($photoPath);
+            }
+        }
+
+        $room->delete();
+
+        return redirect()
+            ->route('admin.rooms')
+            ->with('success', 'Kamar berhasil dihapus!');
     }
 
     /**
@@ -152,5 +223,21 @@ class AdminController extends Controller
         // Bersihkan memory
         imagedestroy($image);
         imagedestroy($newImage);
+    }
+
+    /**
+     * Update status booking
+     */
+    public function updateBookingStatus(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:aktif,tidak_aktif,selesai',
+        ]);
+
+        $booking->update($validated);
+
+        return redirect()
+            ->route('admin.bookings')
+            ->with('success', 'Status booking berhasil diperbarui!');
     }
 }

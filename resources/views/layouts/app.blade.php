@@ -39,18 +39,13 @@
                     <span class="text-lg">🏨</span>
                     <span class="text-sm font-medium">Kelola Kamar</span>
                 </a>
-                <a href="{{ route('admin.bookings') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition {{ request()->routeIs('admin.bookings*') ? 'bg-slate-800' : '' }}">
+                <a href="{{ route('admin.bookings') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition {{ request()->routeIs('admin.bookings') ? 'bg-slate-800' : '' }}">
                     <span class="text-lg">📅</span>
                     <span class="text-sm font-medium">Booking</span>
                 </a>
-                <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition {{ request()->routeIs('admin.users*') ? 'bg-slate-800' : '' }}">
-                    <span class="text-lg">👥</span>
-                    <span class="text-sm font-medium">Users</span>
-                </a>
-                <div class="border-t border-slate-700 my-4"></div>
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition">
-                    <span class="text-lg">🏠</span>
-                    <span class="text-sm font-medium">Ke Halaman Utama</span>
+                <a href="{{ route('admin.bookings.history') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition {{ request()->routeIs('admin.bookings.history') ? 'bg-slate-800' : '' }}">
+                    <span class="text-lg">📜</span>
+                    <span class="text-sm font-medium">Riwayat Booking</span>
                 </a>
             </nav>
 
@@ -78,7 +73,7 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <div class="flex-1 w-full lg:ml-64">
+        <div class="flex-1 w-full lg:ml-64 flex flex-col min-h-screen">
             <!-- Top Bar -->
             <header class="bg-white shadow-sm sticky top-0 z-40">
                 <div class="px-4 md:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -119,7 +114,7 @@
             </div>
 
             <!-- PAGE CONTENT -->
-            <main class="px-4 md:px-6 pb-8">
+            <main class="flex-1 px-4 md:px-6 pb-8">
                 @yield('content')
             </main>
 
