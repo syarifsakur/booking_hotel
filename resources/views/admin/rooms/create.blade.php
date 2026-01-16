@@ -44,9 +44,6 @@
                         <option value="">-- Pilih Tipe Kamar --</option>
                         <option value="Single" @selected(old('type') == 'Single')>Single Room</option>
                         <option value="Double" @selected(old('type') == 'Double')>Double Room</option>
-                        <option value="Twin" @selected(old('type') == 'Twin')>Twin Room</option>
-                        <option value="Suite" @selected(old('type') == 'Suite')>Suite Room</option>
-                        <option value="Family" @selected(old('type') == 'Family')>Family Room</option>
                     </select>
                     @error('type')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
