@@ -234,7 +234,13 @@ class AdminController extends Controller
             'status' => 'required|in:aktif,tidak_aktif,selesai',
         ]);
 
-        $booking->update($validated);
+        $updates = $validated;
+        if ($validated['status'] === 'aktif') {
+            $updates['payment_status'] = 'paid';
+            $updates['paid_at'] = now();
+        }
+
+        $booking->update($updates);
 
         return redirect()
             ->route('admin.bookings')

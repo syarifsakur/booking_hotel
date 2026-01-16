@@ -16,7 +16,19 @@
             <div><b>Check-out:</b> {{ $booking->check_out }}</div>
             <div><b>Malam:</b> {{ $booking->nights }}</div>
             <div><b>Total:</b> Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
-            <div><b>Status:</b> {{ ucfirst($booking->payment_status) }}</div>
+            <div><b>Status:</b> 
+                @if($booking->payment_status === 'unpaid')
+                    Belum Dibayar
+                @elseif($booking->payment_status === 'paid')
+                    Lunas
+                @elseif($booking->payment_status === 'expired')
+                    Kadaluarsa
+                @elseif($booking->payment_status === 'cancelled')
+                    Dibatalkan
+                @else
+                    {{ ucfirst($booking->payment_status) }}
+                @endif
+            </div>
         </div>
     </div>
 </div>

@@ -141,7 +141,17 @@
                             bg-red-100 text-red-800
                         @endif
                     ">
-                        {{ ucfirst($booking->payment_status) }}
+                        @if($booking->payment_status === 'unpaid')
+                            Belum Dibayar
+                        @elseif($booking->payment_status === 'paid')
+                            Lunas
+                        @elseif($booking->payment_status === 'expired')
+                            Kadaluarsa
+                        @elseif($booking->payment_status === 'cancelled')
+                            Dibatalkan
+                        @else
+                            {{ ucfirst($booking->payment_status) }}
+                        @endif
                     </span>
                 </p>
             </div>

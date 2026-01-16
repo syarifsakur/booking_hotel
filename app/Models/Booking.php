@@ -14,6 +14,7 @@ class Booking extends Model
         'guest_phone',
         'guest_whatsapp',
         'guest_ktp_photo',
+        'proof_of_payment',
         'check_in',
         'check_out',
         'nights',

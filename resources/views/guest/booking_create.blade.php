@@ -18,46 +18,55 @@
   @endif
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white p-6 shadow rounded">
-      <form id="booking-form" method="POST" action="{{ route('guest.booking.store') }}">
+    <div class="lg:col-span-2 bg-white p-6 shadow rounded space-y-6">
+      <form id="booking-form" method="POST" action="{{ route('guest.booking.store') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="room_id" value="{{ $room->id }}">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nama Tamu</label>
+            <input name="guest_name" value="{{ old('guest_name') }}" required class="mt-1 block w-full border p-2 rounded" />
+          </div>
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Nama Tamu</label>
-          <input name="guest_name" value="{{ old('guest_name') }}" required class="mt-1 block w-full border p-2 rounded" />
-        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <input name="guest_email" type="email" value="{{ old('guest_email') }}" required class="mt-1 block w-full border p-2 rounded" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
+              <input name="guest_phone" value="{{ old('guest_phone') }}" required class="mt-1 block w-full border p-2 rounded" />
+            </div>
+          </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input name="guest_email" type="email" value="{{ old('guest_email') }}" required class="mt-1 block w-full border p-2 rounded" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Check-in</label>
+              <input id="check_in" name="check_in" type="date" value="{{ old('check_in', request('check_in')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Check-out</label>
+              <input id="check_out" name="check_out" type="date" value="{{ old('check_out', request('check_out')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-            <input name="guest_phone" value="{{ old('guest_phone') }}" required class="mt-1 block w-full border p-2 rounded" />
-          </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Check-in</label>
-            <input id="check_in" name="check_in" type="date" value="{{ old('check_in', request('check_in')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Upload Identitas (KTP/SIM)</label>
+              <input name="guest_ktp_photo" type="file" accept="image/*" class="mt-1 block w-full border p-2 rounded" />
+              <p class="text-xs text-gray-500 mt-1">Opsional, format JPG/PNG, maks 2MB.</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Upload Bukti Pembayaran</label>
+              <input name="proof_of_payment" type="file" accept="image/*" class="mt-1 block w-full border p-2 rounded" />
+              <p class="text-xs text-gray-500 mt-1">Opsional, format JPG/PNG, maks 2MB.</p>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Check-out</label>
-            <input id="check_out" name="check_out" type="date" value="{{ old('check_out', request('check_out')) }}" min="{{ now()->toDateString() }}" required class="mt-1 block w-full border p-2 rounded" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Qty</label>
-            <input id="qty" name="qty" type="number" min="1" max="1" value="{{ old('qty', 1) }}" class="mt-1 block w-full border p-2 rounded" />
-            <p class="text-xs text-gray-500 mt-1">Satu kamar hanya dapat dipesan satu kali per rentang tanggal.</p>
-          </div>
-        </div>
 
-        <div class="mt-6">
-          <label class="block text-sm font-medium text-gray-700">Catatan</label>
-          <textarea name="notes" class="mt-1 block w-full border p-2 rounded" rows="4"></textarea>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Catatan</label>
+            <textarea name="notes" class="mt-1 block w-full border p-2 rounded" rows="4"></textarea>
+          </div>
         </div>
       </form>
     </div>
@@ -85,10 +94,6 @@
           <div>Nights</div>
           <div id="nights_display">0</div>
         </div>
-        <div class="flex justify-between text-sm text-gray-700">
-          <div>Qty</div>
-          <div id="qty_display">1</div>
-        </div>
       </div>
 
       <div class="border-t pt-4">
@@ -109,9 +114,7 @@
   const price = {{ $room->price_per_night }};
   const checkInEl = document.getElementById('check_in');
   const checkOutEl = document.getElementById('check_out');
-  const qtyEl = document.getElementById('qty');
   const nightsDisplay = document.getElementById('nights_display');
-  const qtyDisplay = document.getElementById('qty_display');
   const totalDisplay = document.getElementById('total_display');
 
   function updateTotals(){
@@ -121,16 +124,13 @@
     if (checkInEl.value && checkOutEl.value && outDate > inDate){
       nights = Math.ceil((outDate - inDate) / (1000*60*60*24));
     }
-    const qty = Math.max(1, parseInt(qtyEl.value || 1));
     nightsDisplay.textContent = nights;
-    qtyDisplay.textContent = qty;
-    const total = nights * qty * price;
+    const total = nights * price;
     totalDisplay.textContent = new Intl.NumberFormat('id-ID').format(total);
   }
 
   checkInEl.addEventListener('change', updateTotals);
   checkOutEl.addEventListener('change', updateTotals);
-  qtyEl.addEventListener('input', updateTotals);
 
   // initial
   updateTotals();

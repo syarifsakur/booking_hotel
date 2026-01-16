@@ -31,7 +31,8 @@ class BookingController extends Controller
             'guest_phone' => 'required|string|max:50',
             'check_in' => 'required|date',
             'check_out' => 'required|date|after:check_in',
-            'qty' => 'required|integer|min:1|max:1', // satu kamar = satu unit
+            'guest_ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $room = Room::findOrFail($data['room_id']);
@@ -63,21 +64,30 @@ class BookingController extends Controller
         }
 
         $qty = 1; // satu kamar hanya boleh satu booking per rentang tanggal
+        $ktpPath = $request->hasFile('guest_ktp_photo')
+            ? $request->file('guest_ktp_photo')->store('booking-ktp', 'public')
+            : null;
+        $paymentProofPath = $request->hasFile('proof_of_payment')
+            ? $request->file('proof_of_payment')->store('booking-payment', 'public')
+            : null;
 
         $subtotal = $room->price_per_night * $nights * $qty;
 
-        $booking = DB::transaction(function () use ($data, $room, $nights, $subtotal, $qty) {
+        $booking = DB::transaction(function () use ($data, $room, $nights, $subtotal, $qty, $ktpPath, $paymentProofPath) {
             $booking = Booking::create([
                 'booking_code' => $this->generateBookingCode(),
                 'qr_token' => Str::uuid()->toString(),
                 'guest_name' => $data['guest_name'],
                 'guest_email' => $data['guest_email'],
                 'guest_phone' => $data['guest_phone'],
+                'guest_ktp_photo' => $ktpPath,
+                'proof_of_payment' => $paymentProofPath,
                 'check_in' => $data['check_in'],
                 'check_out' => $data['check_out'],
                 'nights' => $nights,
                 'total_price' => $subtotal,
                 'payment_status' => 'unpaid',
+                'status' => 'tidak_aktif',
                 'expires_at' => now()->addDay(),
             ]);
 

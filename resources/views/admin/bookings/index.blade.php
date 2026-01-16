@@ -23,6 +23,8 @@
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Tanggal Booking</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Check-in</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Check-out</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">KTP</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Bukti Bayar</th>
                     <th class="px-6 py-3 text-center text-sm font-semibold text-slate-700">Status</th>
                 </tr>
             </thead>
@@ -47,6 +49,24 @@
                         <td class="px-6 py-4 text-sm text-slate-600">
                             {{ is_string($booking->check_out) ? $booking->check_out : $booking->check_out->format('d M Y') }}
                         </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">
+                            @if ($booking->guest_ktp_photo)
+                                <a href="{{ asset('storage/' . $booking->guest_ktp_photo) }}" target="_blank" class="inline-flex items-center gap-2 hover:underline">
+                                    <img src="{{ asset('storage/' . $booking->guest_ktp_photo) }}" alt="KTP" class="h-12 w-12 object-cover rounded border" />
+                                </a>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">
+                            @if ($booking->proof_of_payment)
+                                <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" target="_blank" class="inline-flex items-center gap-2 hover:underline">
+                                    <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" alt="Bukti bayar" class="h-12 w-12 object-cover rounded border" />
+                                </a>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-center text-sm">
                             <form action="{{ route('admin.bookings.update-status', $booking->id) }}" method="POST" class="inline-block">
                                 @csrf
@@ -64,7 +84,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-8 text-center text-slate-500">
+                        <td colspan="9" class="px-6 py-8 text-center text-slate-500">
                             📭 Belum ada booking
                         </td>
                     </tr>
