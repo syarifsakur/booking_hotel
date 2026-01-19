@@ -50,17 +50,40 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Metode Pembayaran</label>
+            <div class="mt-2 flex items-center gap-6">
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" name="payment_method" value="cash" {{ old('payment_method') === 'cash' ? 'checked' : '' }} required>
+                <span>Bayar Langsung</span>
+              </label>
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" name="payment_method" value="transfer" {{ old('payment_method') === 'transfer' ? 'checked' : '' }} required>
+                <span>Transfer</span>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Pilih "Transfer" untuk membayar via QRIS dan upload bukti.</p>
+          </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-700">Upload Identitas (KTP/SIM)</label>
               <input name="guest_ktp_photo" type="file" accept="image/*" class="mt-1 block w-full border p-2 rounded" />
               <p class="text-xs text-gray-500 mt-1">Opsional, format JPG/PNG, maks 2MB.</p>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Upload Bukti Pembayaran</label>
+
+            <div id="transfer_section" class="hidden">
+              <label class="block text-sm font-medium text-gray-700">QRIS Pembayaran</label>
+              <div class="mt-1 border rounded p-3 bg-gray-50">
+                @php($qrisImage = config('services.qris.image') ?? null)
+                @if ($qrisImage)
+                  <img src="{{ asset(ltrim($qrisImage, '/')) }}" alt="QRIS" class="w-48 h-48 object-contain mx-auto">
+                @else
+                  <div class="text-xs text-gray-600">QRIS belum dikonfigurasi. Set env <b>QRIS_IMAGE</b> ke path publik (mis: /images/qris.png).</div>
+                @endif
+              </div>
+              <label class="block text-sm font-medium text-gray-700 mt-4">Upload Bukti Pembayaran</label>
               <input name="proof_of_payment" type="file" accept="image/*" class="mt-1 block w-full border p-2 rounded" />
-              <p class="text-xs text-gray-500 mt-1">Opsional, format JPG/PNG, maks 2MB.</p>
-            </div>
+              <p class="text-xs text-gray-500 mt-1">Wajib jika memilih Transfer. Format JPG/PNG, maks 2MB.</p>
           </div>
 
           <div>
@@ -116,6 +139,8 @@
   const checkOutEl = document.getElementById('check_out');
   const nightsDisplay = document.getElementById('nights_display');
   const totalDisplay = document.getElementById('total_display');
+  const transferSection = document.getElementById('transfer_section');
+  const methodInputs = Array.from(document.querySelectorAll('input[name="payment_method"]'));
 
   function updateTotals(){
     const inDate = new Date(checkInEl.value);
@@ -129,11 +154,18 @@
     totalDisplay.textContent = new Intl.NumberFormat('id-ID').format(total);
   }
 
+  function updateMethodUI(){
+    const selected = methodInputs.find(i => i.checked)?.value;
+    transferSection.classList.toggle('hidden', selected !== 'transfer');
+  }
+
   checkInEl.addEventListener('change', updateTotals);
   checkOutEl.addEventListener('change', updateTotals);
+  methodInputs.forEach(i => i.addEventListener('change', updateMethodUI));
 
   // initial
   updateTotals();
+  updateMethodUI();
 </script>
 
 @endsection

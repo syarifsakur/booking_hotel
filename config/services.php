@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // Konfigurasi QRIS untuk pembayaran transfer
+    'qris' => [
+        // Path publik ke gambar QRIS, contoh: /images/qris.png
+        'image' => env('QRIS_IMAGE'),
+    ],
+
 ];

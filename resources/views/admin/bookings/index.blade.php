@@ -23,6 +23,7 @@
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Tanggal Booking</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Check-in</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Check-out</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Metode</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">KTP</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Bukti Bayar</th>
                     <th class="px-6 py-3 text-center text-sm font-semibold text-slate-700">Status</th>
@@ -48,6 +49,16 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-slate-600">
                             {{ is_string($booking->check_out) ? $booking->check_out : $booking->check_out->format('d M Y') }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">
+                            @if ($booking->payment_method)
+                                <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+                                    {{ $booking->payment_method === 'transfer' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700' }}">
+                                    {{ $booking->payment_method === 'transfer' ? 'Transfer' : 'Bayar Langsung' }}
+                                </span>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-slate-600">
                             @if ($booking->guest_ktp_photo)

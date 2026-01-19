@@ -32,7 +32,8 @@ class BookingController extends Controller
             'check_in' => 'required|date',
             'check_out' => 'required|date|after:check_in',
             'guest_ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'payment_method' => 'required|in:cash,transfer',
+            'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048|required_if:payment_method,transfer',
         ]);
 
         $room = Room::findOrFail($data['room_id']);
@@ -81,6 +82,7 @@ class BookingController extends Controller
                 'guest_email' => $data['guest_email'],
                 'guest_phone' => $data['guest_phone'],
                 'guest_ktp_photo' => $ktpPath,
+                'payment_method' => $data['payment_method'],
                 'proof_of_payment' => $paymentProofPath,
                 'check_in' => $data['check_in'],
                 'check_out' => $data['check_out'],
